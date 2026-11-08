@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_zerobounce_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_zerobounce';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class ZerobounceResult {
+  /// Creates a result.
   const ZerobounceResult({
     this.email,
     this.domain,
@@ -87,8 +88,13 @@ class ZerobounceResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class ZerobounceCallResult<T> {
+  /// Creates a call result.
   const ZerobounceCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final ZerobounceResult? result;
 }
@@ -114,26 +120,26 @@ Future<T> tracedZerobounce<T>({
   final span = _tracer().startSpan(
     'zerobounce $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.email != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'zerobounce.email',
           r.result!.email!,
         ));
       }
       if (r.result!.domain != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'zerobounce.domain',
           r.result!.domain!,
         ));
       }
       if (r.result!.status != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'zerobounce.status',
           r.result!.status!,
         ));
@@ -147,91 +153,91 @@ Future<T> tracedZerobounce<T>({
         }
       }
       if (r.result!.subStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'zerobounce.sub_status',
           r.result!.subStatus!,
         ));
       }
       if (r.result!.freeEmail != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'zerobounce.free_email',
           r.result!.freeEmail!,
         ));
       }
       if (r.result!.disposable != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'zerobounce.disposable',
           r.result!.disposable!,
         ));
       }
       if (r.result!.roleBased != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'zerobounce.role_based',
           r.result!.roleBased!,
         ));
       }
       if (r.result!.acceptAll != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'zerobounce.accept_all',
           r.result!.acceptAll!,
         ));
       }
       if (r.result!.smtpProvider != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'zerobounce.smtp.provider',
           r.result!.smtpProvider!,
         ));
       }
       if (r.result!.mxFound != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'zerobounce.mx_found',
           r.result!.mxFound!,
         ));
       }
       if (r.result!.aiScore != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'zerobounce.ai.score',
           r.result!.aiScore!,
         ));
       }
       if (r.result!.aiStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'zerobounce.ai.status',
           r.result!.aiStatus!,
         ));
       }
       if (r.result!.bulkFileId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'zerobounce.bulk.file_id',
           r.result!.bulkFileId!,
         ));
       }
       if (r.result!.bulkPercentComplete != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'zerobounce.bulk.percent_complete',
           r.result!.bulkPercentComplete!,
         ));
       }
       if (r.result!.bulkErrors != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'zerobounce.bulk.errors',
           r.result!.bulkErrors!,
         ));
       }
       if (r.result!.creditsUsed != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'zerobounce.credits.used',
           r.result!.creditsUsed!,
         ));
       }
       if (r.result!.creditsRemaining != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'zerobounce.credits.remaining',
           r.result!.creditsRemaining!,
         ));
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -242,13 +248,13 @@ Future<T> tracedZerobounce<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
